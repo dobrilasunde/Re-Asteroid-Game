@@ -24,6 +24,9 @@ public:
 	void AddAsteroid(class Asteroid* ast);
 	void RemoveAsteroid(class Asteroid* ast);
 	std::vector<class Asteroid*>& GetAsteroids() { return mAsteroids; }
+	
+	void SetGoalBGColor(const Vector3& bgColor) { mGoalBGColor = bgColor; }
+
 private:
 	void ProcessInput();
 	void UpdateGame();
@@ -32,6 +35,8 @@ private:
 	void CreateSpriteVerts();
 	void LoadData();
 	void UnloadData();
+
+	bool IsGoalBGReached();
 
 	std::unordered_map<std::string, class Texture*> mTextures;
 
@@ -51,4 +56,8 @@ private:
 
 	class Ship* mShip;
 	std::vector<class Asteroid*> mAsteroids;
+
+	Vector3 mCurrentBGColor;
+	Vector3 mGoalBGColor;
+	int mChangeColor;
 };

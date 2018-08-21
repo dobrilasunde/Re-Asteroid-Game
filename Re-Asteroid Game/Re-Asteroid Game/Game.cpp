@@ -10,8 +10,10 @@
 #include "Ship.hpp"
 #include "Asteroid.hpp"
 #include "Random.hpp"
+#include "Math.hpp"
+#include<iostream>
 
-Game::Game() :mWindow(nullptr),  mIsRunning(true), mUpdatingActors(false) {}
+Game::Game() :mWindow(nullptr),  mIsRunning(true), mUpdatingActors(false), mCurrentBGColor(Vector3::Zero), mGoalBGColor(Vector3::Zero), mChangeColor(0) {}
 
 bool Game::Initialize()
 {
@@ -144,11 +146,54 @@ void Game::UpdateGame()
 	{
 		delete actor;
 	}
+
+	mCurrentBGColor = mCurrentBGColor + deltaTime * (mGoalBGColor - mCurrentBGColor);
+}
+
+
+bool Game::IsGoalBGReached()
+{
+	if (mGoalBGColor.x != 0 || mGoalBGColor.y != 0 || mGoalBGColor.z != 0)
+	{
+		if (Math::Abs(mCurrentBGColor.x - mGoalBGColor.x) <= 0.01 && Math::Abs(mCurrentBGColor.y - mGoalBGColor.y) <= 0.01 && Math::Abs(mCurrentBGColor.z - mGoalBGColor.z) <= 0.01)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 void Game::GenerateOutput()
 {
-	glClearColor(0.16f, 0.18f, 0.2f, 1.0f);
+	if (mChangeColor == 0)
+	{
+		SetGoalBGColor(Vector3(42, 45, 51));
+	}
+
+	if (IsGoalBGReached())
+	{
+		mChangeColor++;
+
+		switch (mChangeColor)
+		{	
+			case 1:
+				SetGoalBGColor(Vector3(58, 46, 63));
+				break;
+			case 2:
+				SetGoalBGColor(Vector3(94, 63, 107));
+				break;
+			default:
+				SetGoalBGColor(Vector3(42, 45, 51));
+		}
+
+		if (mChangeColor > 2)
+		{
+			mChangeColor = 0;
+		}		
+	}
+
+	
+	glClearColor(mCurrentBGColor.x / 255., mCurrentBGColor.y / 255., mCurrentBGColor.z / 255., 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	glEnable(GL_BLEND);
