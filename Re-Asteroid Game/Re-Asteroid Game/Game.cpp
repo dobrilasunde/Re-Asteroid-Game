@@ -341,11 +341,12 @@ void Game::RemoveAsteroid(Asteroid* ast)
 
 void Game::CreateSpriteVerts()
 {
+	//first three are position, next two are uv coordinates and the last four are rgba vertex color
 	float vertices[] = {
-		-0.5f, 0.5f, 0.f, 0.0f, 0.f, //top left
-		0.5f, 0.5f, 0.f, 1.f, 0.f, //top right
-		0.5f, -0.5f, 0.f, 1.f, 1.f, //bottom right
-		-0.5f, -0.5f, 0.f, 0.f, 1.f //bottom left
+		-0.5f, 0.5f, 0.f, 0.0f, 0.f, 0.0f, 0.0f, 0.0f, 0.0f, //top left
+		0.5f, 0.5f, 0.f, 1.f, 0.f, 0.0f, 0.0f, 0.0f, 0.0f, //top right
+		0.5f, -0.5f, 0.f, 1.f, 1.f, 0.0f, 0.0f, 0.0f, 0.0f, //bottom right
+		-0.5f, -0.5f, 0.f, 0.f, 1.f, 0.0f, 0.0f, 0.0f, 0.0f //bottom left
 	};
 
 	unsigned int indices[] = {

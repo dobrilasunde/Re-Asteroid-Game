@@ -1,24 +1,17 @@
-// ----------------------------------------------------------------
-// From Game Programming in C++ by Sanjay Madhav
-// Copyright (C) 2017 Sanjay Madhav. All rights reserved.
-// 
-// Released under the BSD License
-// See LICENSE in root directory for full details.
-// ----------------------------------------------------------------
-
-// Request GLSL 3.3
 #version 330
 
 // Uniforms for world transform and view-proj
 uniform mat4 uWorldTransform;
 uniform mat4 uViewProj;
 
-// Attribute 0 is position, 1 is tex coords.
+// Attribute 0 is position, 1 is tex coords, 2 is RGB color
 layout(location = 0) in vec3 inPosition;
 layout(location = 1) in vec2 inTexCoord;
+layout(location = 2) in vec4 inRGBA;
 
 // Add texture coordinate as output
 out vec2 fragTexCoord;
+out vec4 fragRGBA;
 
 void main()
 {
@@ -28,6 +21,7 @@ void main()
 	gl_Position = pos * uWorldTransform * uViewProj;
 
 	// Transform
-	// Pass along the texture coordinate to frag shader
+	// Pass along the texture coordinate and RGB color to frag shader
 	fragTexCoord = inTexCoord;
+	fragRGBA = inRGBA;
 }
