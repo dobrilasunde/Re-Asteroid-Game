@@ -11,30 +11,26 @@
 #include "Asteroid.hpp"
 #include "Random.hpp"
 #include "Math.hpp"
-#include<iostream>
+#include <iostream>
+#include "InputSystem.hpp"
 
 Game::Game() :mWindow(nullptr),  mIsRunning(true), mUpdatingActors(false), mCurrentBGColor(Vector3::Zero), mGoalBGColor(Vector3::Zero), mChangeColor(0) {}
 
 bool Game::Initialize()
 {
-	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0)
+	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_GAMECONTROLLER) != 0)
 	{
 		SDL_Log("Unable to initialize SDL: %s", SDL_GetError());
 		return false;
 	}
-	//use the core OpenGL profile
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-	//specify version 3.3
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-	//request a color buffer with 8-bits per RGBA channel
 	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
 	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
 	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
 	SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
-	//enable double buffering
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-	//force OpenGL to use hardware acceleration
 	SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
 
 	mWindow = SDL_CreateWindow("Asteroids", 100, 100, 1024, 768, SDL_WINDOW_OPENGL);
@@ -44,16 +40,23 @@ bool Game::Initialize()
 		return false;
 	}
 
+	mInputSystem = new InputSystem();
+	if (!mInputSystem->Initialize())
+	{
+		SDL_Log("Failed to initialize input system");
+		return false;
+	}
+
 	mContext = SDL_GL_CreateContext(mWindow);
 
-	glewExperimental = GL_TRUE; //prevents an initialization error that may occur when using the core context on some platforms
+	glewExperimental = GL_TRUE;
 	if (glewInit() != GLEW_OK)
 	{
 		SDL_Log("Failed to initialize GLEW.");
 		return false;
 	}
 
-	glGetError(); //on some platforms, glew will emit a benign error code so clear it
+	glGetError();
 
 	if (!LoadShaders())
 	{
@@ -82,6 +85,8 @@ void Game::RunLoop()
 
 void Game::ProcessInput()
 {
+	mInputSystem->PrepareForUpdate();
+
 	SDL_Event event;
 	while (SDL_PollEvent(&event))
 	{
@@ -90,11 +95,18 @@ void Game::ProcessInput()
 		case SDL_QUIT:
 			mIsRunning = false;
 			break;
+		case SDL_MOUSEWHEEL:
+			mInputSystem->ProcessEvent(event);
+			break;
+		default:
+			break;
 		}
 	}
 
-	const Uint8* keyState = SDL_GetKeyboardState(NULL);
-	if (keyState[SDL_SCANCODE_ESCAPE])
+	mInputSystem->Update();
+	const InputState& state = mInputSystem->GetState();
+
+	if (state.Keyboard.GetKeyState(SDL_SCANCODE_ESCAPE) == EReleased)
 	{
 		mIsRunning = false;
 	}
@@ -102,7 +114,7 @@ void Game::ProcessInput()
 	mUpdatingActors = true;
 	for (auto actor : mActors)
 	{
-		actor->ProcessInput(keyState);
+		actor->ProcessInput(state);
 	}
 	mUpdatingActors = false;
 }
@@ -264,6 +276,8 @@ Texture* Game::GetTexture(const std::string& fileName)
 void Game::Shutdown()
 {
 	UnloadData();
+	mInputSystem->Shutdown();
+	delete mInputSystem;
 	delete mSpriteVerts;
 	mSpriteShader->Unload();
 	delete mSpriteShader;

@@ -43,6 +43,8 @@ private:
 	std::vector<class Actor*> mActors;
 	std::vector<class Actor*> mPendingActors;
 
+	class InputSystem* mInputSystem;
+
 	std::vector<class SpriteComponent*> mSprites;
 
 	class Shader* mSpriteShader;

@@ -17,6 +17,7 @@
     <ClCompile Include="VertexArray.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="InputSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Actor.hpp" />
@@ -34,5 +35,6 @@
     <ClInclude Include="VertexArray.hpp" />
     <ClInclude Include="Shader.hpp" />
     <ClInclude Include="Texture.hpp" />
+    <ClInclude Include="InputSystem.hpp" />
   </ItemGroup>
 </Project>
